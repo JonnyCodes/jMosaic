@@ -17,7 +17,8 @@ export default class jMosaic {
         this._rows = rows;
         this._chunkDimensions = chunkDimensions;
         this._tileDimensions = tileDimensions;
-        this._chunks = [];
+        
+        this._chunks = this._generateChunks();
     }
     
     getChunkByIndex(index: number): Chunk {
@@ -31,6 +32,7 @@ export default class jMosaic {
         return this._chunks[row * this._columns + column]
     }
 
+    // Returns the chunk at the given pixel position
     getChunkAtGlobalPosition(x: number, y: number): Chunk {
         const column = Math.floor(x / this._columns);
         const row = Math.floor(y / this._rows);
@@ -38,24 +40,20 @@ export default class jMosaic {
         return this.getChunk(row, column);
     }
 
+    // Returns the tile at the given pixel position
     getTileAtGlobalPosition(x: number, y: number): Tile {
-        const chunkColumn = Math.floor(x / this._columns);
-        const chunkRow = Math.floor(y / this._rows);
-        const tileColumn = Math.floor(x / this._tileDimensions.width) % this._chunkDimensions.width;
-        const tileRow = Math.floor(y / this._tileDimensions.height) % this._chunkDimensions.height;
-
-        return this.getChunk(chunkColumn, chunkRow).getTile(tileColumn, tileRow);
+        return this.getChunkAtGlobalPosition(x, y).getTileAtLocalPosition(x % this._chunkDimensions.width, y % this._chunkDimensions.height);
     }
 
     // Returns up to 9 chunks around position given. Going Left to Right, Top to Bottom
-    getChunks3x3(row: number, column: number): Chunk[][] {
+    getChunks3x3(row: number, column: number, arr: Chunk[][] = []): Chunk[][] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
-        const arr: Chunk[][] = [];
-
         for (let y = Math.max(row - 1, 0); y < Math.min(row + 1, this._rows); y++) {
-            arr[y] = [];
+            if (!Array.isArray(arr[y])) {
+                arr[y] = [];
+            }
             for(let x = Math.min(column - 1); x < Math.min(column + 1, this._columns); x++) {
                 arr[y].push(this._chunks[y * this._columns + x]);
             }
@@ -65,11 +63,10 @@ export default class jMosaic {
     }
 
     // Returns up to 3 chunks above. Left to Right
-    get3ChunksNorth(row: number, column: number): Chunk[] {
+    get3ChunksNorth(row: number, column: number, arr: Chunk[] = []): Chunk[] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
-        const arr: Chunk[] = [];
         const y = row - 1;
 
         if (y >= 0) {
@@ -82,11 +79,10 @@ export default class jMosaic {
     }
 
     // Returns up to 3 chunks to the left. Top to Bottom
-    get3ChunksEast(row: number, column: number): Chunk[] {
+    get3ChunksEast(row: number, column: number, arr: Chunk[] = []): Chunk[] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
-        const arr: Chunk[] = [];
         const x = column + 1;
 
         if (x <= this._columns) {
@@ -99,11 +95,10 @@ export default class jMosaic {
     }
 
     // Returns up to 3 chunks below. Left to Right
-    get3ChunksSouth(row: number, column: number): Chunk[] {
+    get3ChunksSouth(row: number, column: number, arr: Chunk[] = []): Chunk[] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
-        const arr: Chunk[] = [];
         const y = row + 1;
 
         if (y <= this._rows) {
@@ -116,17 +111,26 @@ export default class jMosaic {
     }
 
     // Returns up to 3 chunks to the right. Top to Bottom
-    get3ChunksWest(row: number, column: number): Chunk[] {
+    get3ChunksWest(row: number, column: number, arr: Chunk[] = []): Chunk[] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
-        const arr: Chunk[] = [];
         const x = column - 1;
 
         if (x >= 0) {
             for (let y = Math.max(row - 1, 0); y < Math.max(row + 1, this._rows); y++) {
                 arr.push(this._chunks[y * this._columns + x]);
             }
+        }
+
+        return arr;
+    }
+
+    private _generateChunks(): Chunk[] {
+        const arr: Chunk[] = [];
+
+        for (let i = 0; i < this._rows * this._columns; i++) {
+            arr.push(new Chunk(this._chunkDimensions.width, this._chunkDimensions.height));
         }
 
         return arr;

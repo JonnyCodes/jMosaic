@@ -10,7 +10,7 @@ export default class Chunk {
     constructor(rows: number, columns: number) {
         this._rows = rows;
         this._columns = columns;
-        this._tiles = [];
+        this._tiles = this._generateTiles();
     }
 
     get columns(): number {
@@ -30,5 +30,22 @@ export default class Chunk {
         Utils.checkColumnInRange(column, this._columns);
 
         return this._tiles[row * this._columns + column];
+    }
+
+    getTileAtLocalPosition(x: number, y: number): Tile {
+        const column = Math.floor(x / this._columns);
+        const row = Math.floor(y / this._rows);
+
+        return this.getTile(row, column);
+    }
+
+    private _generateTiles(): Tile[] {
+        const arr: Tile[] = [];
+
+        for (let i = 0; i < this._rows * this._columns; i++) {
+            arr.push(new Tile());
+        }
+
+        return arr;
     }
 }
