@@ -45,16 +45,21 @@ export default class jMosaic {
         return this.getChunkAtGlobalPosition(x, y).getTileAtLocalPosition(x % this._chunkDimensions.width, y % this._chunkDimensions.height);
     }
 
-    // Returns up to 9 chunks around position given. Going Left to Right, Top to Bottom
-    getChunks3x3(row: number, column: number, arr: Chunk[][] = []): Chunk[][] {
+    // Returns the chunks around and including position given. Going Left to Right, Top to Bottom
+    getChunksGrid(row: number, column: number, gridSize: number = 3, arr: Chunk[][] = []): Chunk[][] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
-        for (let y = Math.max(row - 1, 0); y < Math.min(row + 1, this._rows); y++) {
+        const lowerY = Math.max(row - Math.floor(gridSize / 2), 0);
+        const upperY = Math.min(row + (Math.floor(gridSize / 2)) - (1 - (gridSize % 2)), this._rows);
+        const lowerX = Math.max(column - Math.floor(gridSize / 2), 0);
+        const upperX = Math.min(column + (Math.floor(gridSize / 2)) - (1 - (gridSize % 2)), this._columns);
+
+        for (let y = lowerY; y < upperY; y++) {
             if (!Array.isArray(arr[y])) {
                 arr[y] = [];
             }
-            for(let x = Math.min(column - 1); x < Math.min(column + 1, this._columns); x++) {
+            for(let x = lowerX; x < upperX; x++) {
                 arr[y].push(this._chunks[y * this._columns + x]);
             }
         }
@@ -62,15 +67,17 @@ export default class jMosaic {
         return arr;
     }
 
-    // Returns up to 3 chunks above. Left to Right
-    get3ChunksNorth(row: number, column: number, arr: Chunk[] = []): Chunk[] {
+    // Returns up to N chunks above position given. Left to Right
+    getNChunksNorth(row: number, column: number, numChunks:number = 3, arr: Chunk[] = []): Chunk[] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
         const y = row - 1;
+        const lowerX = Math.max(column - Math.floor(numChunks / 2), 0);
+        const upperX = Math.min(column + (Math.floor(numChunks / 2)) - (1 - (numChunks % 2)), this._columns); // Floor half numChunks and minus 1 if an even number was given or the max num columns, whichever is smaller
 
         if (y >= 0) {
-            for (let x = Math.max(column - 1, 0); x < Math.max(column + 1, this._columns); x++) {
+            for (let x = lowerX; x < upperX; x++) {
                 arr.push(this._chunks[y * this._columns + x]);
             }
         }
@@ -78,15 +85,16 @@ export default class jMosaic {
         return arr;
     }
 
-    // Returns up to 3 chunks to the left. Top to Bottom
-    get3ChunksEast(row: number, column: number, arr: Chunk[] = []): Chunk[] {
+    // Returns up to 3 chunks to the left of the given position. Top to Bottom
+    getNChunksEast(row: number, column: number, numChunks:number = 3, arr: Chunk[] = []): Chunk[] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
         const x = column + 1;
-
+        const lowerY = Math.max(row - Math.floor(numChunks / 2), 0);
+        const upperY = Math.min(row + (Math.floor(numChunks / 2)) - (1 - (numChunks % 2)), this._rows); // Floor half numChunks and minus 1 if an even number was given or the max num rows, whichever is smaller
         if (x <= this._columns) {
-            for (let y = Math.max(row - 1, 0); y < Math.max(row + 1, this._rows); y++) {
+            for (let y = lowerY; y < upperY; y++) {
                 arr.push(this._chunks[y * this._columns + x]);
             }
         }
@@ -94,15 +102,17 @@ export default class jMosaic {
         return arr;
     }
 
-    // Returns up to 3 chunks below. Left to Right
-    get3ChunksSouth(row: number, column: number, arr: Chunk[] = []): Chunk[] {
+    // Returns up to 3 chunks below the given position. Left to Right
+    getNChunksSouth(row: number, column: number, numChunks:number = 3, arr: Chunk[] = []): Chunk[] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
         const y = row + 1;
+        const lowerX = Math.max(column - Math.floor(numChunks / 2), 0);
+        const upperX = Math.min(column + (Math.floor(numChunks / 2)) - (1 - (numChunks % 2)), this._columns); // Floor half numChunks and minus 1 if an even number was given or the max num columns, whichever is smaller
 
         if (y <= this._rows) {
-            for (let x = Math.max(column - 1, 0); x < Math.max(column + 1, this._columns); x++) {
+            for (let x = lowerX; x < upperX; x++) {
                 arr.push(this._chunks[y * this._columns + x]);
             }
         }
@@ -111,14 +121,16 @@ export default class jMosaic {
     }
 
     // Returns up to 3 chunks to the right. Top to Bottom
-    get3ChunksWest(row: number, column: number, arr: Chunk[] = []): Chunk[] {
+    get3ChunksWest(row: number, column: number, numChunks:number = 3, arr: Chunk[] = []): Chunk[] {
         Utils.checkRowInRange(row, this._rows);
         Utils.checkColumnInRange(column, this._columns);
 
         const x = column - 1;
+        const lowerY = Math.max(row - Math.floor(numChunks / 2), 0);
+        const upperY = Math.min(row + (Math.floor(numChunks / 2)) - (1 - (numChunks % 2)), this._rows); // Floor half numChunks and minus 1 if an even number was given or the max num rows, whichever is smaller
 
         if (x >= 0) {
-            for (let y = Math.max(row - 1, 0); y < Math.max(row + 1, this._rows); y++) {
+            for (let y = lowerY; y < upperY; y++) {
                 arr.push(this._chunks[y * this._columns + x]);
             }
         }
