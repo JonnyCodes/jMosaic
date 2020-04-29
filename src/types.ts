@@ -1,9 +1,9 @@
-export interface ITileDimensions {
+export interface IDimensions {
     width: number;
-    height: number
+    height: number;
 }
 
-export interface IChunkDimensions {
-    width: number;
-    height: number
-}
+export interface ITile {
+    type: number;
+    data: any;
+};

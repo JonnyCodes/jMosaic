@@ -1,9 +1,17 @@
+import { ITile } from "./types";
+
 export default class Tile {
 
+    private _type: number;
     private _data: any;
 
-    constructor(data: any = {}) {
-        this._data = Object.freeze(data); // TODO: Deep clone
+    constructor(tileData: ITile) {
+        this._type = tileData.type;
+        this._data = Object.freeze(tileData.data); // TODO: Deep clone
+    }
+
+    get type(): number {
+        return this._type;
     }
 
     get data(): any {

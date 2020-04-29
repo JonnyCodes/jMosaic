@@ -1,5 +1,6 @@
 import Tile from "./tile";
 import Utils from "./utils";
+import { ITile } from "./types";
 
 export default class Chunk {
     
@@ -7,18 +8,10 @@ export default class Chunk {
     private _columns: number;
     private _tiles: Tile[];
 
-    constructor(rows: number, columns: number) {
+    constructor(tiles: ITile[], rows: number, columns: number) {
         this._rows = rows;
         this._columns = columns;
-        this._tiles = this._generateTiles();
-    }
-
-    get columns(): number {
-        return this._columns;
-    }
-
-    get rows(): number {
-        return this._rows;
+        this._tiles = this._generateTiles(tiles);
     }
 
     getTiles(): Tile[] {
@@ -39,11 +32,11 @@ export default class Chunk {
         return this.getTile(row, column);
     }
 
-    private _generateTiles(): Tile[] {
+    private _generateTiles(tiles: ITile[]): Tile[] {
         const arr: Tile[] = [];
 
         for (let i = 0; i < this._rows * this._columns; i++) {
-            arr.push(new Tile());
+            arr.push(new Tile(tiles[i]));
         }
 
         return arr;
